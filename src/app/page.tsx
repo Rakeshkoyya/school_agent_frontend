@@ -1,65 +1,224 @@
-import Image from "next/image";
+'use client';
+
+import { useState, useEffect } from 'react';
+import { Sidebar, ChatArea } from '@/components';
+import { Message, Document, Chat } from '@/types';
 
 export default function Home() {
+  const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [isDarkMode, setIsDarkMode] = useState(true);
+  const [documents, setDocuments] = useState<Document[]>([]);
+  const [chats, setChats] = useState<Chat[]>([]);
+  const [currentChatId, setCurrentChatId] = useState<string | null>(null);
+  const [messages, setMessages] = useState<Message[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+
+  // Initialize with dark mode
+  useEffect(() => {
+    document.documentElement.classList.add('dark');
+  }, []);
+
+  // Handle theme toggle
+  const handleThemeToggle = () => {
+    setIsDarkMode(!isDarkMode);
+    document.documentElement.classList.toggle('dark');
+  };
+
+  // Generate unique ID
+  const generateId = () => Math.random().toString(36).substring(2, 15);
+
+  // Handle document upload
+  const handleDocumentUpload = (files: FileList) => {
+    const newDocuments: Document[] = Array.from(files).map((file) => ({
+      id: generateId(),
+      name: file.name,
+      size: file.size,
+      type: file.type,
+      uploadedAt: new Date(),
+      status: 'uploading' as const,
+    }));
+
+    setDocuments((prev) => [...prev, ...newDocuments]);
+
+    // Simulate upload progress
+    newDocuments.forEach((doc) => {
+      setTimeout(() => {
+        setDocuments((prev) =>
+          prev.map((d) => (d.id === doc.id ? { ...d, status: 'processing' as const } : d))
+        );
+      }, 1000);
+
+      setTimeout(() => {
+        setDocuments((prev) =>
+          prev.map((d) => (d.id === doc.id ? { ...d, status: 'ready' as const } : d))
+        );
+      }, 2500);
+    });
+  };
+
+  // Handle document delete
+  const handleDocumentDelete = (id: string) => {
+    setDocuments((prev) => prev.filter((d) => d.id !== id));
+  };
+
+  // Handle new chat
+  const handleNewChat = () => {
+    const newChat: Chat = {
+      id: generateId(),
+      title: 'New Chat',
+      messages: [],
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    };
+    setChats((prev) => [newChat, ...prev]);
+    setCurrentChatId(newChat.id);
+    setMessages([]);
+  };
+
+  // Handle chat select
+  const handleChatSelect = (id: string) => {
+    setCurrentChatId(id);
+    const chat = chats.find((c) => c.id === id);
+    if (chat) {
+      setMessages(chat.messages);
+    }
+  };
+
+  // Handle chat delete
+  const handleChatDelete = (id: string) => {
+    setChats((prev) => prev.filter((c) => c.id !== id));
+    if (currentChatId === id) {
+      setCurrentChatId(null);
+      setMessages([]);
+    }
+  };
+
+  // Handle send message
+  const handleSendMessage = async (content: string) => {
+    // Create user message
+    const userMessage: Message = {
+      id: generateId(),
+      role: 'user',
+      content,
+      timestamp: new Date(),
+    };
+
+    const newMessages = [...messages, userMessage];
+    setMessages(newMessages);
+
+    // Update or create chat
+    if (!currentChatId) {
+      const newChat: Chat = {
+        id: generateId(),
+        title: content.slice(0, 30) + (content.length > 30 ? '...' : ''),
+        messages: newMessages,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      };
+      setChats((prev) => [newChat, ...prev]);
+      setCurrentChatId(newChat.id);
+    } else {
+      setChats((prev) =>
+        prev.map((c) =>
+          c.id === currentChatId
+            ? {
+                ...c,
+                messages: newMessages,
+                updatedAt: new Date(),
+                title:
+                  c.messages.length === 0
+                    ? content.slice(0, 30) + (content.length > 30 ? '...' : '')
+                    : c.title,
+              }
+            : c
+        )
+      );
+    }
+
+    // Call backend API
+    setIsLoading(true);
+
+    try {
+      const response = await fetch('http://127.0.0.1:8000/api/query', {
+        method: 'POST',
+        headers: {
+          'accept': 'application/json',
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          question: content,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const data = await response.json();
+      
+      const assistantMessage: Message = {
+        id: generateId(),
+        role: 'assistant',
+        content: data.answer || data.response || data.message || JSON.stringify(data),
+        timestamp: new Date(),
+      };
+
+      setMessages((prev) => {
+        const updated = [...prev, assistantMessage];
+        // Update chat with new message
+        setChats((prevChats) =>
+          prevChats.map((c) =>
+            c.id === currentChatId ? { ...c, messages: updated, updatedAt: new Date() } : c
+          )
+        );
+        return updated;
+      });
+    } catch (error) {
+      console.error('Error calling backend:', error);
+      
+      const errorMessage: Message = {
+        id: generateId(),
+        role: 'assistant',
+        content: `Sorry, I couldn't connect to the server. Please make sure the backend is running at http://127.0.0.1:8000\n\nError: ${error instanceof Error ? error.message : 'Unknown error'}`,
+        timestamp: new Date(),
+      };
+
+      setMessages((prev) => {
+        const updated = [...prev, errorMessage];
+        setChats((prevChats) =>
+          prevChats.map((c) =>
+            c.id === currentChatId ? { ...c, messages: updated, updatedAt: new Date() } : c
+          )
+        );
+        return updated;
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
-        </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
-      </main>
-    </div>
+    <main className="h-screen overflow-hidden" style={{ background: 'var(--chat-bg)' }}>
+      <Sidebar
+        isOpen={sidebarOpen}
+        onToggle={() => setSidebarOpen(!sidebarOpen)}
+        documents={documents}
+        onDocumentUpload={handleDocumentUpload}
+        onDocumentDelete={handleDocumentDelete}
+        chats={chats}
+        currentChatId={currentChatId}
+        onChatSelect={handleChatSelect}
+        onNewChat={handleNewChat}
+        onChatDelete={handleChatDelete}
+        isDarkMode={isDarkMode}
+        onThemeToggle={handleThemeToggle}
+      />
+      <ChatArea
+        messages={messages}
+        onSendMessage={handleSendMessage}
+        isLoading={isLoading}
+        sidebarOpen={sidebarOpen}
+      />
+    </main>
   );
 }
