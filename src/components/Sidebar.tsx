@@ -9,6 +9,7 @@ import {
   MessageSquare,
   ChevronLeft,
   ChevronRight,
+  ChevronDown,
   Moon,
   Sun,
   Loader2,
@@ -17,6 +18,8 @@ import {
   CheckCircle,
   AlertCircle,
   ClipboardList,
+  CalendarDays,
+  UserCheck,
   GraduationCap,
 } from 'lucide-react';
 import { Document, Chat } from '@/types';
@@ -34,8 +37,8 @@ interface SidebarProps {
   onChatDelete: (id: string) => void;
   isDarkMode: boolean;
   onThemeToggle: () => void;
-  currentPage: 'chat' | 'attendance' | 'exam';
-  onPageChange: (page: 'chat' | 'attendance' | 'exam') => void;
+  currentPage: 'chat' | 'attendance' | 'monthly-attendance' | 'exam' | 'monthly-exam';
+  onPageChange: (page: 'chat' | 'attendance' | 'monthly-attendance' | 'exam' | 'monthly-exam') => void;
 }
 
 export default function Sidebar({
@@ -55,6 +58,8 @@ export default function Sidebar({
   onPageChange,
 }: SidebarProps) {
   const [isDragging, setIsDragging] = useState(false);
+  const [isAttendanceExpanded, setIsAttendanceExpanded] = useState(false);
+  const [isExamExpanded, setIsExamExpanded] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleDragOver = (e: React.DragEvent) => {
@@ -139,29 +144,91 @@ export default function Sidebar({
             <span className="font-medium">New Chat</span>
           </button>
 
-          {/* Attendance Button */}
-          <button
-            onClick={() => onPageChange('attendance')}
-            className={`flex items-center gap-3 w-full p-3 mt-2 rounded-lg border transition-colors hover:bg-[var(--hover-bg)] ${
-              currentPage === 'attendance' ? 'bg-[var(--hover-bg)]' : ''
-            }`}
-            style={{ borderColor: 'var(--border-color)' }}
-          >
-            <ClipboardList className="w-5 h-5" />
-            <span className="font-medium">Attendance</span>
-          </button>
+          {/* Attendance Section with Submenu */}
+          <div className="mt-2">
+            <button
+              onClick={() => setIsAttendanceExpanded(!isAttendanceExpanded)}
+              className={`flex items-center gap-3 w-full p-3 rounded-lg border transition-colors hover:bg-[var(--hover-bg)] ${
+                currentPage === 'attendance' || currentPage === 'monthly-attendance' ? 'bg-[var(--hover-bg)]' : ''
+              }`}
+              style={{ borderColor: 'var(--border-color)' }}
+            >
+              <ClipboardList className="w-5 h-5" />
+              <span className="font-medium flex-1 text-left">Attendance</span>
+              <ChevronDown
+                className={`w-4 h-4 transition-transform ${
+                  isAttendanceExpanded ? 'rotate-180' : ''
+                }`}
+              />
+            </button>
+            
+            {/* Submenu */}
+            {isAttendanceExpanded && (
+              <div className="ml-4 mt-1 space-y-1">
+                <button
+                  onClick={() => onPageChange('attendance')}
+                  className={`flex items-center gap-3 w-full p-2 pl-3 rounded-lg transition-colors hover:bg-[var(--hover-bg)] ${
+                    currentPage === 'attendance' ? 'bg-[var(--hover-bg)]' : ''
+                  }`}
+                >
+                  <UserCheck className="w-4 h-4" />
+                  <span className="text-sm">Mark Attendance</span>
+                </button>
+                <button
+                  onClick={() => onPageChange('monthly-attendance')}
+                  className={`flex items-center gap-3 w-full p-2 pl-3 rounded-lg transition-colors hover:bg-[var(--hover-bg)] ${
+                    currentPage === 'monthly-attendance' ? 'bg-[var(--hover-bg)]' : ''
+                  }`}
+                >
+                  <CalendarDays className="w-4 h-4" />
+                  <span className="text-sm">Monthly View</span>
+                </button>
+              </div>
+            )}
+          </div>
 
-          {/* Exam Results Button */}
-          <button
-            onClick={() => onPageChange('exam')}
-            className={`flex items-center gap-3 w-full p-3 mt-2 rounded-lg border transition-colors hover:bg-[var(--hover-bg)] ${
-              currentPage === 'exam' ? 'bg-[var(--hover-bg)]' : ''
-            }`}
-            style={{ borderColor: 'var(--border-color)' }}
-          >
-            <GraduationCap className="w-5 h-5" />
-            <span className="font-medium">Exam Results</span>
-          </button>
+          {/* Exam Section with Submenu */}
+          <div className="mt-2">
+            <button
+              onClick={() => setIsExamExpanded(!isExamExpanded)}
+              className={`flex items-center gap-3 w-full p-3 rounded-lg border transition-colors hover:bg-[var(--hover-bg)] ${
+                currentPage === 'exam' || currentPage === 'monthly-exam' ? 'bg-[var(--hover-bg)]' : ''
+              }`}
+              style={{ borderColor: 'var(--border-color)' }}
+            >
+              <GraduationCap className="w-5 h-5" />
+              <span className="font-medium flex-1 text-left">Exam Results</span>
+              <ChevronDown
+                className={`w-4 h-4 transition-transform ${
+                  isExamExpanded ? 'rotate-180' : ''
+                }`}
+              />
+            </button>
+            
+            {/* Submenu */}
+            {isExamExpanded && (
+              <div className="ml-4 mt-1 space-y-1">
+                <button
+                  onClick={() => onPageChange('exam')}
+                  className={`flex items-center gap-3 w-full p-2 pl-3 rounded-lg transition-colors hover:bg-[var(--hover-bg)] ${
+                    currentPage === 'exam' ? 'bg-[var(--hover-bg)]' : ''
+                  }`}
+                >
+                  <UserCheck className="w-4 h-4" />
+                  <span className="text-sm">Enter Marks</span>
+                </button>
+                <button
+                  onClick={() => onPageChange('monthly-exam')}
+                  className={`flex items-center gap-3 w-full p-2 pl-3 rounded-lg transition-colors hover:bg-[var(--hover-bg)] ${
+                    currentPage === 'monthly-exam' ? 'bg-[var(--hover-bg)]' : ''
+                  }`}
+                >
+                  <CalendarDays className="w-4 h-4" />
+                  <span className="text-sm">Monthly View</span>
+                </button>
+              </div>
+            )}
+          </div>
 
           {/* Document Upload Area */}
           <div className="mt-4">

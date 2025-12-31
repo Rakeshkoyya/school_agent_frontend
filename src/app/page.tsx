@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Sidebar, ChatArea, AttendancePage, ExamPage } from '@/components';
+import { Sidebar, ChatArea, AttendancePage, MonthlyAttendancePage, ExamPage, MonthlyExamPage } from '@/components';
 import { Message, Document, Chat } from '@/types';
 
 export default function Home() {
@@ -12,7 +12,7 @@ export default function Home() {
   const [currentChatId, setCurrentChatId] = useState<string | null>(null);
   const [messages, setMessages] = useState<Message[]>([]);
   const [isLoading, setIsLoading] = useState(false);
-  const [currentPage, setCurrentPage] = useState<'chat' | 'attendance' | 'exam'>('chat');
+  const [currentPage, setCurrentPage] = useState<'chat' | 'attendance' | 'monthly-attendance' | 'exam' | 'monthly-exam'>('chat');
 
   // Initialize with dark mode
   useEffect(() => {
@@ -233,8 +233,12 @@ export default function Home() {
           />
         ) : currentPage === 'attendance' ? (
           <AttendancePage isDarkMode={isDarkMode} />
-        ) : (
+        ) : currentPage === 'monthly-attendance' ? (
+          <MonthlyAttendancePage isDarkMode={isDarkMode} />
+        ) : currentPage === 'exam' ? (
           <ExamPage isDarkMode={isDarkMode} />
+        ) : (
+          <MonthlyExamPage isDarkMode={isDarkMode} />
         )}
       </div>
     </main>

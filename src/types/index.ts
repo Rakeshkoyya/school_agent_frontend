@@ -53,6 +53,21 @@ export interface AttendanceResponse {
   total_records: number;
 }
 
+// Monthly Attendance Types
+export interface MonthlyStudentAttendance {
+  student_id: number;
+  name: string;
+  attendance: Record<string, 'P' | 'A'>;
+}
+
+export interface MonthlyAttendanceResponse {
+  year: number;
+  month: number;
+  class_section: string;
+  days_in_month: number;
+  students: MonthlyStudentAttendance[];
+}
+
 // Exam Types
 export interface ExamRecord {
   student_id: number;
@@ -73,4 +88,20 @@ export interface ExamResponse {
   class_section: string;
   subject: string;
   total_records: number;
+}
+
+// Monthly Exam Types
+export interface MonthlyStudentExam {
+  student_id: number;
+  name: string;
+  exams: Record<string, number>;
+}
+
+export interface MonthlyExamResponse {
+  year: number;
+  month: number;
+  class_section: string;
+  subject: string;
+  days_in_month: number;
+  students: MonthlyStudentExam[];
 }
