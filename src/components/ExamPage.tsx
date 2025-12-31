@@ -356,7 +356,7 @@ export default function ExamPage({ isDarkMode }: ExamPageProps) {
                   {students.map((student, index) => (
                     <div
                       key={student.student_id}
-                      className="flex items-center justify-between p-4 rounded-lg hover:bg-[var(--hover-bg)] transition-colors"
+                      className="flex items-center justify-between p-4 rounded-lg hover:bg-(--hover-bg) transition-colors"
                       style={{ border: '1px solid var(--border-color)' }}
                     >
                       <div className="flex items-center gap-4">

@@ -221,7 +221,7 @@ export default function Home() {
       />
       <div
         className={`h-full transition-all duration-300 ${
-          sidebarOpen ? 'ml-[260px]' : 'ml-0'
+          sidebarOpen ? 'ml-65' : 'ml-0'
         }`}
       >
         {currentPage === 'chat' ? (

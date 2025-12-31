@@ -109,8 +109,8 @@ export default function Sidebar({
       {/* Toggle Button */}
       <button
         onClick={onToggle}
-        className={`fixed top-4 z-50 p-2 rounded-lg transition-all duration-300 hover:bg-[var(--hover-bg)] ${
-          isOpen ? 'left-[268px]' : 'left-4'
+        className={`fixed top-4 z-50 p-2 rounded-lg transition-all duration-300 hover:bg-(--hover-bg) ${
+          isOpen ? 'left-67' : 'left-4'
         }`}
         style={{ background: 'var(--sidebar-bg)', border: '1px solid var(--border-color)' }}
       >
@@ -135,8 +135,8 @@ export default function Sidebar({
               onNewChat();
               onPageChange('chat');
             }}
-            className={`flex items-center gap-3 w-full p-3 rounded-lg border transition-colors hover:bg-[var(--hover-bg)] ${
-              currentPage === 'chat' ? 'bg-[var(--hover-bg)]' : ''
+            className={`flex items-center gap-3 w-full p-3 rounded-lg border transition-colors hover:bg-(--hover-bg) ${
+              currentPage === 'chat' ? 'bg-(--hover-bg)' : ''
             }`}
             style={{ borderColor: 'var(--border-color)' }}
           >
@@ -148,8 +148,8 @@ export default function Sidebar({
           <div className="mt-2">
             <button
               onClick={() => setIsAttendanceExpanded(!isAttendanceExpanded)}
-              className={`flex items-center gap-3 w-full p-3 rounded-lg border transition-colors hover:bg-[var(--hover-bg)] ${
-                currentPage === 'attendance' || currentPage === 'monthly-attendance' ? 'bg-[var(--hover-bg)]' : ''
+              className={`flex items-center gap-3 w-full p-3 rounded-lg border transition-colors hover:bg-(--hover-bg) ${
+                currentPage === 'attendance' || currentPage === 'monthly-attendance' ? 'bg-(--hover-bg)' : ''
               }`}
               style={{ borderColor: 'var(--border-color)' }}
             >
@@ -167,8 +167,8 @@ export default function Sidebar({
               <div className="ml-4 mt-1 space-y-1">
                 <button
                   onClick={() => onPageChange('attendance')}
-                  className={`flex items-center gap-3 w-full p-2 pl-3 rounded-lg transition-colors hover:bg-[var(--hover-bg)] ${
-                    currentPage === 'attendance' ? 'bg-[var(--hover-bg)]' : ''
+                  className={`flex items-center gap-3 w-full p-2 pl-3 rounded-lg transition-colors hover:bg-(--hover-bg) ${
+                    currentPage === 'attendance' ? 'bg-(--hover-bg)' : ''
                   }`}
                 >
                   <UserCheck className="w-4 h-4" />
@@ -176,8 +176,8 @@ export default function Sidebar({
                 </button>
                 <button
                   onClick={() => onPageChange('monthly-attendance')}
-                  className={`flex items-center gap-3 w-full p-2 pl-3 rounded-lg transition-colors hover:bg-[var(--hover-bg)] ${
-                    currentPage === 'monthly-attendance' ? 'bg-[var(--hover-bg)]' : ''
+                  className={`flex items-center gap-3 w-full p-2 pl-3 rounded-lg transition-colors hover:bg-(--hover-bg) ${
+                    currentPage === 'monthly-attendance' ? 'bg-(--hover-bg)' : ''
                   }`}
                 >
                   <CalendarDays className="w-4 h-4" />
@@ -191,8 +191,8 @@ export default function Sidebar({
           <div className="mt-2">
             <button
               onClick={() => setIsExamExpanded(!isExamExpanded)}
-              className={`flex items-center gap-3 w-full p-3 rounded-lg border transition-colors hover:bg-[var(--hover-bg)] ${
-                currentPage === 'exam' || currentPage === 'monthly-exam' ? 'bg-[var(--hover-bg)]' : ''
+              className={`flex items-center gap-3 w-full p-3 rounded-lg border transition-colors hover:bg-(--hover-bg) ${
+                currentPage === 'exam' || currentPage === 'monthly-exam' ? 'bg-(--hover-bg)' : ''
               }`}
               style={{ borderColor: 'var(--border-color)' }}
             >
@@ -210,8 +210,8 @@ export default function Sidebar({
               <div className="ml-4 mt-1 space-y-1">
                 <button
                   onClick={() => onPageChange('exam')}
-                  className={`flex items-center gap-3 w-full p-2 pl-3 rounded-lg transition-colors hover:bg-[var(--hover-bg)] ${
-                    currentPage === 'exam' ? 'bg-[var(--hover-bg)]' : ''
+                  className={`flex items-center gap-3 w-full p-2 pl-3 rounded-lg transition-colors hover:bg-(--hover-bg) ${
+                    currentPage === 'exam' ? 'bg-(--hover-bg)' : ''
                   }`}
                 >
                   <UserCheck className="w-4 h-4" />
@@ -219,8 +219,8 @@ export default function Sidebar({
                 </button>
                 <button
                   onClick={() => onPageChange('monthly-exam')}
-                  className={`flex items-center gap-3 w-full p-2 pl-3 rounded-lg transition-colors hover:bg-[var(--hover-bg)] ${
-                    currentPage === 'monthly-exam' ? 'bg-[var(--hover-bg)]' : ''
+                  className={`flex items-center gap-3 w-full p-2 pl-3 rounded-lg transition-colors hover:bg-(--hover-bg) ${
+                    currentPage === 'monthly-exam' ? 'bg-(--hover-bg)' : ''
                   }`}
                 >
                   <CalendarDays className="w-4 h-4" />
@@ -242,8 +242,8 @@ export default function Sidebar({
               onClick={() => fileInputRef.current?.click()}
               className={`border-2 border-dashed rounded-lg p-4 text-center cursor-pointer transition-all ${
                 isDragging
-                  ? 'border-[var(--primary)] bg-[var(--primary)]/10'
-                  : 'border-[var(--border-color)] hover:border-[var(--primary)]/50'
+                  ? 'border-(--primary) bg-(--primary)/10'
+                  : 'border-(--border-color) hover:border-(--primary)/50'
               }`}
             >
               <Upload className="w-8 h-8 mx-auto mb-2 opacity-60" />
@@ -262,14 +262,14 @@ export default function Sidebar({
 
           {/* Document List */}
           {documents.length > 0 && (
-            <div className="mt-4 flex-shrink-0 max-h-[200px] overflow-y-auto">
+            <div className="mt-4 shrink-0 max-h-50 overflow-y-auto">
               <div className="space-y-1">
                 {documents.map((doc) => (
                   <div
                     key={doc.id}
-                    className="flex items-center gap-2 p-2 rounded-lg hover:bg-[var(--hover-bg)] group"
+                    className="flex items-center gap-2 p-2 rounded-lg hover:bg-(--hover-bg) group"
                   >
-                    <File className="w-4 h-4 flex-shrink-0 opacity-60" />
+                    <File className="w-4 h-4 shrink-0 opacity-60" />
                     <div className="flex-1 min-w-0">
                       <p className="text-sm truncate">{doc.name}</p>
                       <p className="text-xs opacity-50">{formatFileSize(doc.size)}</p>
@@ -302,11 +302,11 @@ export default function Sidebar({
                   onClick={() => onChatSelect(chat.id)}
                   className={`flex items-center gap-2 p-2 rounded-lg cursor-pointer group transition-colors ${
                     currentChatId === chat.id
-                      ? 'bg-[var(--hover-bg)]'
-                      : 'hover:bg-[var(--hover-bg)]'
+                      ? 'bg-(--hover-bg)'
+                      : 'hover:bg-(--hover-bg)'
                   }`}
                 >
-                  <MessageSquare className="w-4 h-4 flex-shrink-0 opacity-60" />
+                  <MessageSquare className="w-4 h-4 shrink-0 opacity-60" />
                   <span className="flex-1 text-sm truncate">{chat.title}</span>
                   <button
                     onClick={(e) => {
@@ -326,7 +326,7 @@ export default function Sidebar({
           <div className="mt-auto pt-4 border-t" style={{ borderColor: 'var(--border-color)' }}>
             <button
               onClick={onThemeToggle}
-              className="flex items-center gap-3 w-full p-3 rounded-lg hover:bg-[var(--hover-bg)] transition-colors"
+              className="flex items-center gap-3 w-full p-3 rounded-lg hover:bg-(--hover-bg) transition-colors"
             >
               {isDarkMode ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
               <span className="text-sm">{isDarkMode ? 'Light Mode' : 'Dark Mode'}</span>

@@ -240,19 +240,19 @@ export default function MonthlyExamPage({ isDarkMode }: MonthlyExamPageProps) {
   return (
     <div className="flex flex-col h-full p-6 overflow-hidden">
       {/* Header */}
-      <div className="flex-shrink-0 mb-6">
+      <div className="shrink-0 mb-6">
         <div className="flex items-center gap-3 mb-2">
-          <GraduationCap className="w-8 h-8 text-[var(--primary)]" />
+          <GraduationCap className="w-8 h-8 text-(--primary)" />
           <h1 className="text-2xl font-bold">Monthly Exam Results</h1>
         </div>
         <p className="text-sm opacity-70">View student exam results for any month</p>
       </div>
 
       {/* Controls */}
-      <div className="flex-shrink-0 mb-6">
+      <div className="shrink-0 mb-6">
         <div className="flex flex-wrap gap-4 items-end">
           {/* Class Selection */}
-          <div className="min-w-[180px]">
+          <div className="min-w-45">
             <label className="block text-sm font-medium mb-2">Select Class</label>
             <div className="relative">
               <select
@@ -280,7 +280,7 @@ export default function MonthlyExamPage({ isDarkMode }: MonthlyExamPageProps) {
           </div>
 
           {/* Subject Selection */}
-          <div className="min-w-[180px]">
+          <div className="min-w-45">
             <label className="block text-sm font-medium mb-2">Select Subject</label>
             <div className="relative">
               <select
@@ -311,7 +311,7 @@ export default function MonthlyExamPage({ isDarkMode }: MonthlyExamPageProps) {
           <div className="flex items-center gap-2">
             <button
               onClick={handlePreviousMonth}
-              className="p-3 rounded-lg hover:bg-[var(--hover-bg)] transition-colors"
+              className="p-3 rounded-lg hover:bg-(--hover-bg) transition-colors"
               style={{ border: '1px solid var(--border-color)' }}
             >
               <ChevronLeft className="w-5 h-5" />
@@ -353,7 +353,7 @@ export default function MonthlyExamPage({ isDarkMode }: MonthlyExamPageProps) {
 
             <button
               onClick={handleNextMonth}
-              className="p-3 rounded-lg hover:bg-[var(--hover-bg)] transition-colors"
+              className="p-3 rounded-lg hover:bg-(--hover-bg) transition-colors"
               style={{ border: '1px solid var(--border-color)' }}
             >
               <ChevronRight className="w-5 h-5" />
@@ -364,8 +364,8 @@ export default function MonthlyExamPage({ isDarkMode }: MonthlyExamPageProps) {
 
       {/* Error Message */}
       {error && (
-        <div className="flex-shrink-0 mb-4 flex items-center gap-2 p-4 rounded-lg bg-red-500/10 border border-red-500/30 text-red-500">
-          <AlertCircle className="w-5 h-5 flex-shrink-0" />
+        <div className="shrink-0 mb-4 flex items-center gap-2 p-4 rounded-lg bg-red-500/10 border border-red-500/30 text-red-500">
+          <AlertCircle className="w-5 h-5 shrink-0" />
           <span>{error}</span>
         </div>
       )}
@@ -374,7 +374,7 @@ export default function MonthlyExamPage({ isDarkMode }: MonthlyExamPageProps) {
       {isLoadingExams && (
         <div className="flex-1 flex items-center justify-center">
           <div className="flex flex-col items-center gap-3">
-            <Loader2 className="w-10 h-10 animate-spin text-[var(--primary)]" />
+            <Loader2 className="w-10 h-10 animate-spin text-(--primary)" />
             <span className="text-sm opacity-70">Loading exam data...</span>
           </div>
         </div>
@@ -416,7 +416,7 @@ export default function MonthlyExamPage({ isDarkMode }: MonthlyExamPageProps) {
                   <th
                     key={`week-${week.weekNumber}`}
                     colSpan={week.days.length}
-                    className="p-2 text-center font-semibold border-b border-r text-[var(--primary)]"
+                    className="p-2 text-center font-semibold border-b border-r text-(--primary)"
                     style={{ borderColor: 'var(--border-color)' }}
                   >
                     Week {week.weekNumber}
@@ -441,7 +441,7 @@ export default function MonthlyExamPage({ isDarkMode }: MonthlyExamPageProps) {
                     {week.days.map((dayInfo, dayIdx) => (
                       <th
                         key={`day-${dayInfo.day}`}
-                        className={`p-1 text-center border-b min-w-[45px] ${
+                        className={`p-1 text-center border-b min-w-11.25 ${
                           dayIdx === week.days.length - 1 && weekIdx < getWeeksWithDays().length - 1 ? 'border-r' : ''
                         }`}
                         style={{ borderColor: 'var(--border-color)' }}
@@ -471,7 +471,7 @@ export default function MonthlyExamPage({ isDarkMode }: MonthlyExamPageProps) {
                   return (
                     <tr
                       key={student.student_id}
-                      className="hover:bg-[var(--hover-bg)] transition-colors"
+                      className="hover:bg-(--hover-bg) transition-colors"
                       style={{
                         background: index % 2 === 0 ? 'transparent' : 'var(--hover-bg)',
                       }}
@@ -484,7 +484,7 @@ export default function MonthlyExamPage({ isDarkMode }: MonthlyExamPageProps) {
                         }}
                       >
                         <div className="flex items-center gap-2">
-                          <div className="w-8 h-8 rounded-full bg-[var(--primary)]/20 flex items-center justify-center text-sm font-bold text-[var(--primary)]">
+                          <div className="w-8 h-8 rounded-full bg-(--primary)/20 flex items-center justify-center text-sm font-bold text-(--primary)">
                             {student.name.charAt(0)}
                           </div>
                           <span>{student.name}</span>
@@ -543,7 +543,7 @@ export default function MonthlyExamPage({ isDarkMode }: MonthlyExamPageProps) {
 
       {/* Legend */}
       {selectedClass && selectedSubject && examData && !isLoadingExams && (
-        <div className="flex-shrink-0 mt-4 flex items-center gap-6 text-sm">
+        <div className="shrink-0 mt-4 flex items-center gap-6 text-sm">
           <div className="flex items-center gap-2">
             <span className="inline-flex items-center justify-center w-6 h-6 rounded bg-green-500/20 text-green-600 dark:text-green-400 text-xs font-bold">
               80+

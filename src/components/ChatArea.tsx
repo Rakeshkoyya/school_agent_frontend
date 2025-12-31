@@ -68,7 +68,7 @@ export default function ChatArea({ messages, onSendMessage, isLoading, sidebarOp
   return (
     <div
       className={`flex flex-col h-screen transition-all duration-300 ${
-        sidebarOpen ? 'ml-[260px]' : 'ml-0'
+        sidebarOpen ? 'ml-65' : 'ml-0'
       }`}
     >
       {/* Messages Area */}
@@ -97,7 +97,7 @@ export default function ChatArea({ messages, onSendMessage, isLoading, sidebarOp
                   <button
                     key={index}
                     onClick={() => setInput(suggestion)}
-                    className="p-4 rounded-xl border hover:bg-[var(--hover-bg)] transition-colors text-left"
+                    className="p-4 rounded-xl border hover:bg-(--hover-bg) transition-colors text-left"
                     style={{ borderColor: 'var(--border-color)' }}
                   >
                     <span className="text-sm">{suggestion}</span>
@@ -120,7 +120,7 @@ export default function ChatArea({ messages, onSendMessage, isLoading, sidebarOp
                 >
                   {/* Avatar */}
                   <div
-                    className={`w-8 h-8 rounded-full flex-shrink-0 flex items-center justify-center ${
+                    className={`w-8 h-8 rounded-full shrink-0 flex items-center justify-center ${
                       message.role === 'user' ? 'bg-blue-600' : ''
                     }`}
                     style={message.role === 'assistant' ? { background: 'var(--primary)' } : {}}
@@ -138,7 +138,7 @@ export default function ChatArea({ messages, onSendMessage, isLoading, sidebarOp
                       className={`rounded-2xl px-4 py-3 ${
                         message.role === 'user'
                           ? 'bg-blue-600 text-white rounded-tr-sm'
-                          : 'bg-[var(--user-message-bg)] rounded-tl-sm'
+                          : 'bg-(--user-message-bg) rounded-tl-sm'
                       }`}
                     >
                       <p className="whitespace-pre-wrap">{message.content}</p>
@@ -172,13 +172,13 @@ export default function ChatArea({ messages, onSendMessage, isLoading, sidebarOp
               <div className="mb-6">
                 <div className="flex gap-4 max-w-[85%]">
                   <div
-                    className="w-8 h-8 rounded-full flex-shrink-0 flex items-center justify-center"
+                    className="w-8 h-8 rounded-full shrink-0 flex items-center justify-center"
                     style={{ background: 'var(--primary)' }}
                   >
                     <Bot className="w-5 h-5 text-white" />
                   </div>
                   <div className="flex-1">
-                    <div className="rounded-2xl rounded-tl-sm px-4 py-3 bg-[var(--user-message-bg)]">
+                    <div className="rounded-2xl rounded-tl-sm px-4 py-3 bg-(--user-message-bg)">
                       <div className="flex items-center gap-2">
                         <Loader2 className="w-4 h-4 animate-spin" />
                         <span className="opacity-60">Thinking...</span>
@@ -211,7 +211,7 @@ export default function ChatArea({ messages, onSendMessage, isLoading, sidebarOp
               onKeyDown={handleKeyDown}
               placeholder="Message School Agent..."
               rows={1}
-              className="flex-1 resize-none bg-transparent outline-none placeholder-opacity-50 max-h-[200px]"
+              className="flex-1 resize-none bg-transparent outline-none placeholder-opacity-50 max-h-50"
               style={{ minHeight: '24px' }}
             />
             <button
@@ -219,7 +219,7 @@ export default function ChatArea({ messages, onSendMessage, isLoading, sidebarOp
               disabled={!input.trim() || isLoading}
               className={`p-2 rounded-lg transition-all ${
                 input.trim() && !isLoading
-                  ? 'bg-[var(--primary)] hover:bg-[var(--primary-hover)] text-white'
+                  ? 'bg-(--primary) hover:bg-(--primary-hover) text-white'
                   : 'opacity-40 cursor-not-allowed'
               }`}
             >
