@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   Users,
   Calendar,
@@ -9,6 +9,9 @@ import {
   Loader2,
   AlertCircle,
   ChevronDown,
+  Upload,
+  FileSpreadsheet,
+  X,
 } from 'lucide-react';
 import { ClassSection, Student, AttendanceRecord, AttendancePayload, AttendanceResponse } from '@/types';
 
@@ -31,6 +34,21 @@ export default function AttendancePage({ isDarkMode }: AttendancePageProps) {
   
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
+
+  // File upload states
+  const [isDragging, setIsDragging] = useState(false);
+  const [uploadedFile, setUploadedFile] = useState<File | null>(null);
+  const [isUploading, setIsUploading] = useState(false);
+  const [uploadResponse, setUploadResponse] = useState<{
+    success: boolean;
+    message: string;
+    total_records?: number;
+    inserted_records?: number;
+    updated_records?: number;
+    new_students_created?: number;
+    errors?: string[];
+  } | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Fetch classes on component mount
   useEffect(() => {
@@ -160,6 +178,103 @@ export default function AttendancePage({ isDarkMode }: AttendancePageProps) {
   const presentCount = Object.values(attendance).filter((s) => s === 'Present').length;
   const absentCount = Object.values(attendance).filter((s) => s === 'Absent').length;
 
+  // File upload handlers
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragging(true);
+  };
+
+  const handleDragLeave = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragging(false);
+  };
+
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragging(false);
+    const files = e.dataTransfer.files;
+    if (files.length > 0) {
+      handleFileSelect(files[0]);
+    }
+  };
+
+  const handleFileInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (files && files.length > 0) {
+      handleFileSelect(files[0]);
+    }
+  };
+
+  const handleFileSelect = (file: File) => {
+    // Validate file type
+    const validTypes = [
+      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+      'application/vnd.ms-excel',
+      '.xlsx',
+      '.xls'
+    ];
+    const fileExtension = file.name.toLowerCase().split('.').pop();
+    
+    if (!validTypes.includes(file.type) && !['xlsx', 'xls'].includes(fileExtension || '')) {
+      setError('Please upload a valid Excel file (.xlsx or .xls)');
+      return;
+    }
+    
+    setUploadedFile(file);
+    setError(null);
+    setUploadResponse(null);
+  };
+
+  const handleFileUpload = async () => {
+    if (!uploadedFile) return;
+
+    setIsUploading(true);
+    setError(null);
+    setSuccess(null);
+    setUploadResponse(null);
+
+    const formData = new FormData();
+    formData.append('file', uploadedFile);
+
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/attendance/upload-excel`, {
+        method: 'POST',
+        headers: {
+          'accept': 'application/json',
+        },
+        body: formData,
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.detail || data.message || 'Failed to upload file');
+      }
+
+      setUploadResponse(data);
+      if (data.success) {
+        setSuccess(data.message);
+        setUploadedFile(null);
+      } else {
+        setError(data.message || 'Upload failed');
+      }
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : 'Failed to upload file. Please try again.';
+      setError(errorMessage);
+      console.error('Error uploading file:', err);
+    } finally {
+      setIsUploading(false);
+    }
+  };
+
+  const clearUploadedFile = () => {
+    setUploadedFile(null);
+    setUploadResponse(null);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+  };
+
   return (
     <div className="flex-1 flex flex-col h-full overflow-hidden">
       {/* Header */}
@@ -232,6 +347,137 @@ export default function AttendancePage({ isDarkMode }: AttendancePageProps) {
               </div>
             </div>
           </div>
+
+          {/* File Upload Section - Hidden when class is selected */}
+          {!selectedClass && (
+            <div
+              className="p-6 rounded-xl"
+              style={{ background: 'var(--message-bg)', border: '1px solid var(--border-color)' }}
+            >
+              <div className="flex items-center gap-2 mb-4">
+                <Upload className="w-5 h-5" style={{ color: 'var(--primary)' }} />
+                <h2 className="text-lg font-medium">Upload Attendance File</h2>
+              </div>
+              <p className="text-sm opacity-60 mb-4">
+                Or upload an Excel file to import attendance records in bulk. Supported formats: .xlsx, .xls
+              </p>
+
+              {/* Drag and Drop Zone */}
+              <div
+                onDragOver={handleDragOver}
+                onDragLeave={handleDragLeave}
+                onDrop={handleDrop}
+                onClick={() => fileInputRef.current?.click()}
+                className={`relative border-2 border-dashed rounded-xl p-8 text-center cursor-pointer transition-all ${
+                  isDragging
+                    ? 'border-[var(--primary)] bg-[var(--primary)]/10'
+                    : 'border-[var(--border-color)] hover:border-[var(--primary)]/50 hover:bg-[var(--hover-bg)]'
+                }`}
+              >
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept=".xlsx,.xls,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-excel"
+                  onChange={handleFileInputChange}
+                  className="hidden"
+                />
+                
+                {isUploading ? (
+                  <div className="flex flex-col items-center gap-3">
+                    <Loader2 className="w-12 h-12 animate-spin" style={{ color: 'var(--primary)' }} />
+                    <p className="font-medium">Uploading...</p>
+                    <p className="text-sm opacity-60">Please wait while we process your file</p>
+                  </div>
+                ) : uploadedFile ? (
+                  <div className="flex flex-col items-center gap-3">
+                    <FileSpreadsheet className="w-12 h-12 text-green-500" />
+                    <p className="font-medium">{uploadedFile.name}</p>
+                    <p className="text-sm opacity-60">
+                      {(uploadedFile.size / 1024).toFixed(1)} KB
+                    </p>
+                    <div className="flex items-center gap-3 mt-2">
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleFileUpload();
+                        }}
+                        className="flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-all"
+                        style={{ background: 'var(--primary)', color: 'white' }}
+                      >
+                        <Upload className="w-4 h-4" />
+                        Upload File
+                      </button>
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          clearUploadedFile();
+                        }}
+                        className="flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-all bg-red-500/20 text-red-500 hover:bg-red-500/30"
+                      >
+                        <X className="w-4 h-4" />
+                        Remove
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="flex flex-col items-center gap-3">
+                    <Upload className="w-12 h-12 opacity-40" />
+                    <p className="font-medium">
+                      {isDragging ? 'Drop your file here' : 'Drag & drop your Excel file here'}
+                    </p>
+                    <p className="text-sm opacity-60">or click to browse</p>
+                  </div>
+                )}
+              </div>
+
+              {/* Upload Response Details */}
+              {uploadResponse && uploadResponse.success && (
+                <div className="mt-4 p-4 rounded-lg bg-green-500/10 border border-green-500/30">
+                  <div className="flex items-start gap-3">
+                    <CheckCircle className="w-5 h-5 text-green-500 mt-0.5" />
+                    <div className="flex-1">
+                      <p className="text-green-500 font-medium mb-2">Upload Successful!</p>
+                      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-sm">
+                        <div className="p-2 rounded-lg bg-green-500/10">
+                          <p className="opacity-60">Total Records</p>
+                          <p className="font-medium text-green-500">{uploadResponse.total_records}</p>
+                        </div>
+                        <div className="p-2 rounded-lg bg-green-500/10">
+                          <p className="opacity-60">Inserted</p>
+                          <p className="font-medium text-green-500">{uploadResponse.inserted_records}</p>
+                        </div>
+                        <div className="p-2 rounded-lg bg-blue-500/10">
+                          <p className="opacity-60">Updated</p>
+                          <p className="font-medium text-blue-500">{uploadResponse.updated_records}</p>
+                        </div>
+                        <div className="p-2 rounded-lg bg-purple-500/10">
+                          <p className="opacity-60">New Students</p>
+                          <p className="font-medium text-purple-500">{uploadResponse.new_students_created}</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Upload Errors */}
+              {uploadResponse && uploadResponse.errors && uploadResponse.errors.length > 0 && (
+                <div className="mt-4 p-4 rounded-lg bg-red-500/10 border border-red-500/30">
+                  <div className="flex items-start gap-3">
+                    <AlertCircle className="w-5 h-5 text-red-500 mt-0.5" />
+                    <div className="flex-1">
+                      <p className="text-red-500 font-medium mb-2">Errors occurred during upload:</p>
+                      <ul className="list-disc list-inside text-sm text-red-500 space-y-1">
+                        {uploadResponse.errors.map((err, index) => (
+                          <li key={index}>{err}</li>
+                        ))}
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
 
           {/* Error Message */}
           {error && (
