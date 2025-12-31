@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Sidebar, ChatArea } from '@/components';
+import { Sidebar, ChatArea, AttendancePage, ExamPage } from '@/components';
 import { Message, Document, Chat } from '@/types';
 
 export default function Home() {
@@ -12,6 +12,7 @@ export default function Home() {
   const [currentChatId, setCurrentChatId] = useState<string | null>(null);
   const [messages, setMessages] = useState<Message[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [currentPage, setCurrentPage] = useState<'chat' | 'attendance' | 'exam'>('chat');
 
   // Initialize with dark mode
   useEffect(() => {
@@ -207,18 +208,35 @@ export default function Home() {
         onDocumentDelete={handleDocumentDelete}
         chats={chats}
         currentChatId={currentChatId}
-        onChatSelect={handleChatSelect}
+        onChatSelect={(id) => {
+          handleChatSelect(id);
+          setCurrentPage('chat');
+        }}
         onNewChat={handleNewChat}
         onChatDelete={handleChatDelete}
         isDarkMode={isDarkMode}
         onThemeToggle={handleThemeToggle}
+        currentPage={currentPage}
+        onPageChange={setCurrentPage}
       />
-      <ChatArea
-        messages={messages}
-        onSendMessage={handleSendMessage}
-        isLoading={isLoading}
-        sidebarOpen={sidebarOpen}
-      />
+      <div
+        className={`h-full transition-all duration-300 ${
+          sidebarOpen ? 'ml-[260px]' : 'ml-0'
+        }`}
+      >
+        {currentPage === 'chat' ? (
+          <ChatArea
+            messages={messages}
+            onSendMessage={handleSendMessage}
+            isLoading={isLoading}
+            sidebarOpen={sidebarOpen}
+          />
+        ) : currentPage === 'attendance' ? (
+          <AttendancePage isDarkMode={isDarkMode} />
+        ) : (
+          <ExamPage isDarkMode={isDarkMode} />
+        )}
+      </div>
     </main>
   );
 }

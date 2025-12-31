@@ -16,6 +16,8 @@ import {
   File,
   CheckCircle,
   AlertCircle,
+  ClipboardList,
+  GraduationCap,
 } from 'lucide-react';
 import { Document, Chat } from '@/types';
 
@@ -32,6 +34,8 @@ interface SidebarProps {
   onChatDelete: (id: string) => void;
   isDarkMode: boolean;
   onThemeToggle: () => void;
+  currentPage: 'chat' | 'attendance' | 'exam';
+  onPageChange: (page: 'chat' | 'attendance' | 'exam') => void;
 }
 
 export default function Sidebar({
@@ -47,6 +51,8 @@ export default function Sidebar({
   onChatDelete,
   isDarkMode,
   onThemeToggle,
+  currentPage,
+  onPageChange,
 }: SidebarProps) {
   const [isDragging, setIsDragging] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -120,12 +126,41 @@ export default function Sidebar({
         <div className="flex flex-col h-full p-3">
           {/* New Chat Button */}
           <button
-            onClick={onNewChat}
-            className="flex items-center gap-3 w-full p-3 rounded-lg border transition-colors hover:bg-[var(--hover-bg)]"
+            onClick={() => {
+              onNewChat();
+              onPageChange('chat');
+            }}
+            className={`flex items-center gap-3 w-full p-3 rounded-lg border transition-colors hover:bg-[var(--hover-bg)] ${
+              currentPage === 'chat' ? 'bg-[var(--hover-bg)]' : ''
+            }`}
             style={{ borderColor: 'var(--border-color)' }}
           >
             <Plus className="w-5 h-5" />
             <span className="font-medium">New Chat</span>
+          </button>
+
+          {/* Attendance Button */}
+          <button
+            onClick={() => onPageChange('attendance')}
+            className={`flex items-center gap-3 w-full p-3 mt-2 rounded-lg border transition-colors hover:bg-[var(--hover-bg)] ${
+              currentPage === 'attendance' ? 'bg-[var(--hover-bg)]' : ''
+            }`}
+            style={{ borderColor: 'var(--border-color)' }}
+          >
+            <ClipboardList className="w-5 h-5" />
+            <span className="font-medium">Attendance</span>
+          </button>
+
+          {/* Exam Results Button */}
+          <button
+            onClick={() => onPageChange('exam')}
+            className={`flex items-center gap-3 w-full p-3 mt-2 rounded-lg border transition-colors hover:bg-[var(--hover-bg)] ${
+              currentPage === 'exam' ? 'bg-[var(--hover-bg)]' : ''
+            }`}
+            style={{ borderColor: 'var(--border-color)' }}
+          >
+            <GraduationCap className="w-5 h-5" />
+            <span className="font-medium">Exam Results</span>
           </button>
 
           {/* Document Upload Area */}
